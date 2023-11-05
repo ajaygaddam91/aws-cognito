@@ -10,7 +10,7 @@ var sendData = (userName,email, subject, description)=>{
         // Change - Your API here
         'https://q4f59rqax0.execute-api.us-east-1.amazonaws.com/ajay-dev/test', 
         {
-            method: "POST", 
+            method: "GET", 
             body: JSON.stringify({
                 "name": userName,
                 "email": email,
