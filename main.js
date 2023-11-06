@@ -1,54 +1,38 @@
-const url = window.location.href
-const replacedURL = url.replace('#', '&')
-const finalURL = new URLSearchParams(replacedURL)
-var accessToken = finalURL.get('access_token')
-var idToken = finalURL.get("id_token")
-var UserName, UserEmail;
-
-// Change - Your region
-aws_region = 'us-east-1';
-AWS.config.region = aws_region; 
-
-AWS.config.apiVersions = {
-    cognitoidentityserviceprovider: '2016-04-18'
-}; 
-
-var cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider(); 
-
-var params = {
-    AccessToken:  accessToken
-};
-
 cognitoidentityserviceprovider.getUser(params, function(err, data) {
-    if (err) 
-    {
-        // Change - Link to the Home Page
-        window.location.href = 'https://ajaygaddam91.github.io/aws-cognito/'
-    }
-    else 
-    {
+    if (err) {
+        // Handle the error, e.g., redirect to the home page
+        window.location.href = 'https://ajaygaddam91.github.io/aws-cognito/';
+    } else {
         console.log(data);
 
-        for(var i = 0; i < data.UserAttributes.length; i++)
-        {
-            if(data.UserAttributes[i].Name == 'name')
-            {
-                UserName = data.UserAttributes[i].Value;
+        // Initialize User Name and Email as empty strings
+        UserName = '';
+        UserEmail = '';
+
+        // Iterate through user attributes
+        for (var i = 0; i < data.UserAttributes.length; i++) {
+            var attributeName = data.UserAttributes[i].Name;
+            var attributeValue = data.UserAttributes[i].Value;
+
+            if (attributeName === 'name') {
+                UserName = attributeValue;
+            } else if (attributeName === 'email') {
+                UserEmail = attributeValue;
             }
         }
 
-        for(var j = 0; j < data.UserAttributes.length; j++)
-        {
-            if(data.UserAttributes[j].Name == 'email')
-            {
-                UserEmail = data.UserAttributes[j].Value;
-            }
+        // Check if the user's name and email were found
+        if (UserName && UserEmail) {
+            // Display the user's name and email
+            document.getElementById('userName').innerHTML = UserName;
+            document.getElementById('userEmail').innerHTML = UserEmail;
+
+            // Set input field values if necessary
+            document.getElementById('userNameInput').value = UserName;
+            document.getElementById('userEmailInput').value = UserEmail;
+        } else {
+            // Handle the case where user attributes were not found
+            console.log('Name and/or email not found in user attributes');
         }
-
-        document.getElementById('userName').innerHTML = UserName;
-        document.getElementById('userEmail').innerHTML = UserEmail;  
-
-        document.getElementById('userNameInput').value =UserName;
-        document.getElementById('userEmailInput').value = UserEmail;    
     }
 });
